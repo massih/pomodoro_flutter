@@ -11,9 +11,9 @@ class Pomodoro extends StatefulWidget {
 class _PomodoroState extends State<Pomodoro> {
   final Database _db = Database();
 
-//  final Duration studyDuration = new Duration(minutes: 25);
-  final Duration studyDuration = new Duration(seconds: 25);
-  final Duration breakDuration = new Duration(minutes: 5);
+//  final Duration studyDuration = Duration(minutes: 25);
+  final Duration studyDuration = Duration(seconds: 25);
+  final Duration breakDuration = Duration(minutes: 5);
 
   bool _inProgress;
   CountdownTimer _countdownTimer;
@@ -27,8 +27,7 @@ class _PomodoroState extends State<Pomodoro> {
   }
 
   void _startTimer() {
-    _countdownTimer =
-    new CountdownTimer(studyDuration, new Duration(seconds: 1));
+    _countdownTimer = CountdownTimer(studyDuration, Duration(seconds: 1));
 
     _countdownTimer.listen(_timerListener, onDone: _timerDone);
     setState(() {
@@ -70,13 +69,12 @@ class _PomodoroState extends State<Pomodoro> {
     if (!_inProgress) {
       return 0;
     }
-    return _countdownTimer.elapsed.inSeconds/(_countdownTimer.remaining.inSeconds + _countdownTimer.elapsed.inSeconds);
+    return _countdownTimer.elapsed.inSeconds / (_countdownTimer.remaining.inSeconds + _countdownTimer.elapsed.inSeconds);
   }
 
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       body: Center(
         child: Padding(
@@ -112,13 +110,13 @@ class _PomodoroState extends State<Pomodoro> {
 
   CircularProgressIndicator buildCircularProgressIndicator(BuildContext context) {
     return CircularProgressIndicator(
-                    backgroundColor: Colors.blueAccent,
-                    valueColor: AlwaysStoppedAnimation<Color>(Theme
-                        .of(context)
-                        .backgroundColor),
-                    value: _getIndicatorValue(),
-                    strokeWidth: 15,
-                  );
+      backgroundColor: Colors.blueAccent,
+      valueColor: AlwaysStoppedAnimation<Color>(Theme
+          .of(context)
+          .backgroundColor),
+      value: _getIndicatorValue(),
+      strokeWidth: 15,
+    );
   }
 
   Text buildTimerText(BuildContext context) {

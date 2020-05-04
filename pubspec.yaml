@@ -37,7 +37,7 @@ flutter:
   fonts:
     - family: digital7
       fonts:
-        - asset: fonts/digital-7.ttf
+        - asset: fonts/digital-7-mono.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:
