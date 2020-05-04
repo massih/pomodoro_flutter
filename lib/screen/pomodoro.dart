@@ -10,6 +10,7 @@ class Pomodoro extends StatefulWidget {
 
 class _PomodoroState extends State<Pomodoro> {
   final Database _db = Database();
+
 //  final Duration studyDuration = new Duration(minutes: 25);
   final Duration studyDuration = new Duration(seconds: 25);
   final Duration breakDuration = new Duration(minutes: 5);
@@ -27,7 +28,7 @@ class _PomodoroState extends State<Pomodoro> {
 
   void _startTimer() {
     _countdownTimer =
-        new CountdownTimer(studyDuration, new Duration(seconds: 1));
+    new CountdownTimer(studyDuration, new Duration(seconds: 1));
 
     _countdownTimer.listen(_timerListener, onDone: _timerDone);
     setState(() {
@@ -58,24 +59,66 @@ class _PomodoroState extends State<Pomodoro> {
     });
     print('canceled');
   }
-  
+
   String _getTimerText() {
     var minutes = _timer.inMinutes.remainder(60).toString().padLeft(2, '0');
     var seconds = _timer.inSeconds.remainder(60).toString().padLeft(2, '0');
     return '$minutes:$seconds';
   }
 
+  double _getIndicatorValue() {
+    if (!_inProgress) {
+      return 0;
+    }
+    return _countdownTimer.elapsed.inSeconds/(_countdownTimer.remaining.inSeconds + _countdownTimer.elapsed.inSeconds);
+  }
+
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[buildTimerText(context), buildStartRaisedButton()],
+        child: Padding(
+          padding: const EdgeInsets.all(50.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Stack(
+                  children: <Widget>[
+                    SizedBox(
+                      width: 300,
+                      height: 300,
+                      child: buildCircularProgressIndicator(context),
+                    ),
+                    Positioned.fill(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: buildTimerText(context),
+                        )
+                    ),
+                  ]
+              ),
+              Padding(
+                padding: const EdgeInsets.all(50.0),
+                child: buildStartRaisedButton(),
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  CircularProgressIndicator buildCircularProgressIndicator(BuildContext context) {
+    return CircularProgressIndicator(
+                    backgroundColor: Colors.blueAccent,
+                    valueColor: AlwaysStoppedAnimation<Color>(Theme
+                        .of(context)
+                        .backgroundColor),
+                    value: _getIndicatorValue(),
+                    strokeWidth: 15,
+                  );
   }
 
   Text buildTimerText(BuildContext context) {
