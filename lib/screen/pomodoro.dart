@@ -1,77 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pomodoro/service/database.dart';
-import 'package:quiver/async.dart';
+import 'package:pomodoro/service/pomodoro_bloc.dart';
+import 'package:pomodoro/utils/pomodoro_helper.dart';
+import 'package:provider/provider.dart';
 
-class Pomodoro extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => _PomodoroState();
-}
-
-class _PomodoroState extends State<Pomodoro> {
-  final Database _db = Database();
-
-//  final Duration studyDuration = Duration(minutes: 25);
-  final Duration studyDuration = Duration(seconds: 25);
-  final Duration breakDuration = Duration(minutes: 5);
-
-  bool _inProgress;
-  CountdownTimer _countdownTimer;
-  Duration _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _inProgress = false;
-    _timer = studyDuration;
-  }
-
-  void _startTimer() {
-    _countdownTimer = CountdownTimer(studyDuration, Duration(seconds: 1));
-
-    _countdownTimer.listen(_timerListener, onDone: _timerDone);
-    setState(() {
-      _inProgress = true;
-      _countdownTimer = _countdownTimer;
-      _timer = _countdownTimer.remaining;
-    });
-  }
-
-  void _timerListener(CountdownTimer event) {
-    Duration remainingTime = event.remaining;
-    print(remainingTime);
-    setState(() {
-      _timer = remainingTime;
-    });
-  }
-
-  void _timerDone() {
-    print('Timer FINITO');
-  }
-
-
-  void _cancelTimer() {
-    setState(() {
-      _inProgress = false;
-      _countdownTimer = _countdownTimer.cancel();
-      _timer = studyDuration;
-    });
-    print('canceled');
-  }
-
-  String _getTimerText() {
-    var minutes = _timer.inMinutes.remainder(60).toString().padLeft(2, '0');
-    var seconds = _timer.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return '$minutes:$seconds';
-  }
-
-  double _getIndicatorValue() {
-    if (!_inProgress) {
-      return 0;
-    }
-    return _countdownTimer.elapsed.inSeconds / (_countdownTimer.remaining.inSeconds + _countdownTimer.elapsed.inSeconds);
-  }
-
+class Pomodoro extends StatelessWidget {
+  final PomodoroBloc _pomodoroBloc = PomodoroBloc();
 
   @override
   Widget build(BuildContext context) {
@@ -79,49 +13,63 @@ class _PomodoroState extends State<Pomodoro> {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(50.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Stack(
+          child: Consumer<PomodoroTimer>(
+              builder: (BuildContext context, PomodoroTimer value, Widget child) {
+                if (value == null) {
+                  _pomodoroBloc.initStudy();
+                  return CircularProgressIndicator();
+                }
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    SizedBox(
-                      width: 300,
-                      height: 300,
-                      child: buildCircularProgressIndicator(context),
+                    buildPomodoro(context, value),
+                    Padding(
+                      padding: const EdgeInsets.all(50.0),
+                      child: buildStartRaisedButton(value),
                     ),
-                    Positioned.fill(
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: buildTimerText(context),
-                        )
-                    ),
-                  ]
-              ),
-              Padding(
-                padding: const EdgeInsets.all(50.0),
-                child: buildStartRaisedButton(),
-              ),
-            ],
+                  ],
+                );
+              }
           ),
         ),
       ),
     );
   }
 
-  CircularProgressIndicator buildCircularProgressIndicator(BuildContext context) {
+  Stack buildPomodoro(BuildContext context, PomodoroTimer _data) {
+    return Stack(
+        children: <Widget>[
+          SizedBox(
+            width: 300,
+            height: 300,
+            child: buildCircularProgressIndicator(context, _data),
+          ),
+          Positioned.fill(
+              child: Align(
+                alignment: Alignment.center,
+                child: buildTimerText(_data),
+              )
+          ),
+        ]
+    );
+  }
+
+  CircularProgressIndicator buildCircularProgressIndicator(BuildContext context, PomodoroTimer data) {
     return CircularProgressIndicator(
-      backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: Theme
+          .of(context)
+          .primaryColor,
       valueColor: AlwaysStoppedAnimation<Color>(Theme
           .of(context)
           .canvasColor),
-      value: _getIndicatorValue(),
+      value: _getIndicatorValue(data),
       strokeWidth: 15,
     );
   }
 
-  Text buildTimerText(BuildContext context) {
+  Text buildTimerText(PomodoroTimer _data) {
     return Text(
-      _getTimerText(),
+      _getTimerText(_data),
       style: TextStyle(
         fontFamily: 'digital7',
         fontSize: 84,
@@ -131,17 +79,35 @@ class _PomodoroState extends State<Pomodoro> {
     );
   }
 
-  RaisedButton buildStartRaisedButton() {
-    return RaisedButton(
-      child: Text(_inProgress ? 'Cancel' : 'Start'),
-      onPressed: () {
-        if (_inProgress) {
-          _cancelTimer();
-        } else {
-          _startTimer();
-        }
-      },
-    );
+  double _getIndicatorValue(PomodoroTimer _data) {
+    if (_data.elapsed.inSeconds == 0) {
+      return 0;
+    }
+    return _data.elapsed.inSeconds / (_data.remaining.inSeconds + _data.elapsed.inSeconds);
   }
 
+  String _getTimerText(PomodoroTimer _data) {
+    var minutes = _data.remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
+    var seconds = _data.remaining.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
+
+  RaisedButton buildStartRaisedButton(PomodoroTimer _pomodoroTimer) {
+    final _buttonText = _pomodoroTimer.inProgress ? 'Cancel' : 'Start';
+    if (_pomodoroTimer.inProgress) {
+      return RaisedButton(child: Text(_buttonText), onPressed: () {
+        _pomodoroBloc.cancelTimer();
+      });
+    }
+
+    if (_pomodoroTimer.session == PomodoroSession.STUDY) {
+      return RaisedButton(child: Text(_buttonText), onPressed: () {
+        _pomodoroBloc.startStudySession(_pomodoroTimer.remaining);
+      });
+    } else {
+      return RaisedButton(child: Text(_buttonText), onPressed: () {
+        _pomodoroBloc.startBreakSession(_pomodoroTimer.remaining);
+      });
+    }
+  }
 }
