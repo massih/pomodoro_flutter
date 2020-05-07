@@ -1,34 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:pomodoro/screen/pomodoro.dart';
-//
-//void main() => () {
-////      await initiateLocalNotification();
-//      return runApp(MyApp());
-//    };
-void main() => runApp(MyApp());
+import 'package:pomodoro/screen/settings.dart';
+import 'package:pomodoro/screen/statistics.dart';
 
-//Future initiateLocalNotification() async {
-//  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-//  // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
-//  var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
-//  var initializationSettingsIOS = IOSInitializationSettings(
-//      onDidReceiveLocalNotification: onDidReceiveLocalNotification);
-//  var initializationSettings = InitializationSettings(
-//      initializationSettingsAndroid, initializationSettingsIOS);
-//  await flutterLocalNotificationsPlugin.initialize(initializationSettings,
-//      onSelectNotification: selectNotification);
-//}
-//
-//Future selectNotification(String payload) async {
-//  if (payload != null) {
-//    debugPrint('notification payload: ' + payload);
-//  }
-//  await Navigator.push(
-//    context,
-//    MaterialPageRoute(builder: (context) => SecondScreen(payload)),
-//  );
-//}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
@@ -36,9 +11,58 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Pomodoro',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.red,
       ),
-      home: Pomodoro(),
+      home: HomePage(),
+    );
+  }
+}
+
+class HomePage extends StatefulWidget {
+  @override
+  createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+  final List<Widget> _widgetOptions = <Widget>[
+    Statistics(),
+    Pomodoro(),
+    SettingsPage(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.red,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.equalizer),
+            title: Text('Stats'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.timer),
+            title: Text('Timer'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            title: Text('Settings'),
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.white,
+        onTap: _onItemTapped,
+      ),
     );
   }
 }

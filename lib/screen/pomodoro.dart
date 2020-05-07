@@ -110,10 +110,10 @@ class _PomodoroState extends State<Pomodoro> {
 
   CircularProgressIndicator buildCircularProgressIndicator(BuildContext context) {
     return CircularProgressIndicator(
-      backgroundColor: Colors.blueAccent,
+      backgroundColor: Theme.of(context).primaryColor,
       valueColor: AlwaysStoppedAnimation<Color>(Theme
           .of(context)
-          .backgroundColor),
+          .canvasColor),
       value: _getIndicatorValue(),
       strokeWidth: 15,
     );
