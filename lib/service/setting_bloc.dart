@@ -5,9 +5,9 @@ import 'package:pomodoro/utils/database.dart';
 
 class SettingBloc {
   final DBHelper _dbHelper = DBHelper();
-  final _settingController =  StreamController<SettingModel>();
+  static StreamController settingController =  StreamController<SettingModel>.broadcast();
 
-  Stream<SettingModel> get setting => _settingController.stream;
+  Stream<SettingModel> get setting => settingController.stream;
 
   SettingBloc() {
     fetchSetting();
@@ -15,7 +15,7 @@ class SettingBloc {
 
   fetchSetting() async {
     final SettingModel _fetchedSettings = await _dbHelper.settingFetch();
-    _settingController.add(_fetchedSettings);
+    settingController.sink.add(_fetchedSettings);
   }
 
   updateSetting(SettingModel newSetting) async {
@@ -24,6 +24,6 @@ class SettingBloc {
   }
 
   dispose() {
-    _settingController.close();
+    settingController.close();
   }
 }

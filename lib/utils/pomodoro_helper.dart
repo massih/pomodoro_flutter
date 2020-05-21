@@ -5,10 +5,10 @@ enum PomodoroSession {
 }
 
 class PomodoroTimer {
-  Duration elapsed;
-  Duration remaining;
-  PomodoroSession session;
-  bool inProgress;
+  final Duration elapsed;
+  final Duration remaining;
+  final PomodoroSession session;
+  final bool inProgress;
 
   PomodoroTimer(this.elapsed, this.remaining, this.session, this.inProgress);
 }
