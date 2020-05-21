@@ -26,12 +26,15 @@ class PomodoroBloc {
   PomodoroBloc._() {
     SettingBloc.settingController.stream.listen((event) {
       if (!_inProgress) {
-       if (_session == PomodoroSession.STUDY) {initStudy();}
-       else {initBreak();}
+        if (_session == PomodoroSession.STUDY) {
+          initStudy();
+        }
+        else {
+          initBreak();
+        }
       }
     });
   }
-
 
   Stream<PomodoroTimer> get timer {
     return _streamController.stream;
@@ -44,8 +47,7 @@ class PomodoroBloc {
     final _duration = Duration(seconds: 25);
     _countdownTimer = CountdownTimer(_duration, _increment);
     _countdownTimer.listen((event) {
-      final _timerData = PomodoroTimer(event.elapsed, event.remaining, PomodoroSession.STUDY, _inProgress);
-      _streamController.add(_timerData);
+      streamPomodoroTimer(event);
     }, onDone: () {
       initBreak();
     });
@@ -55,39 +57,49 @@ class PomodoroBloc {
   void startBreakSession(Duration _duration) {
     _session = PomodoroSession.BREAK;
     _inProgress = true;
+
     _countdownTimer = CountdownTimer(_duration, _increment);
     _countdownTimer.listen((event) {
-      final _timerData = PomodoroTimer(event.elapsed, event.remaining, PomodoroSession.BREAK, _inProgress);
-      _streamController.add(_timerData);
+      streamPomodoroTimer(event);
+    }, onDone: () {
+      initStudy();
     });
 //  TODO save the timestamp for stats
   }
+
   void cancelTimer() {
-    _inProgress = false;
     _countdownTimer.cancel();
     initStudy();
   }
 
   void initStudy() async {
+    _inProgress = false;
     _session = PomodoroSession.STUDY;
     final Duration _studyPeriod = await _dbHelper.getStudyDuration();
     final PomodoroTimer _pomodoroTimer = PomodoroTimer(
         Duration(minutes: 0),
         _studyPeriod,
-        PomodoroSession.STUDY,
+        _session,
         _inProgress);
     _streamController.add(_pomodoroTimer);
   }
 
   void initBreak() async {
+    _inProgress = false;
     _session = PomodoroSession.BREAK;
+
     final Duration _breakPeriod = await _dbHelper.getBreakDuration();
     final PomodoroTimer _pomodoroTimer = PomodoroTimer(
         Duration(minutes: 0),
         _breakPeriod,
-        PomodoroSession.BREAK,
+        _session,
         _inProgress);
     _streamController.add(_pomodoroTimer);
+  }
+
+  void streamPomodoroTimer(CountdownTimer event) {
+    final _timerData = PomodoroTimer(event.elapsed, event.remaining, _session, _inProgress);
+    _streamController.add(_timerData);
   }
 
 
