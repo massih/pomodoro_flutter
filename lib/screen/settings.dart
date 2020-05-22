@@ -14,6 +14,7 @@ class _SettingPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+//    TODO change to CONSUMER and change this stateful, save in DB onChangeDone
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -64,7 +65,7 @@ class _SettingPageState extends State<SettingsPage> {
                     Slider(
                       min: SettingModel.minStudyPeriodValue,
                       max: SettingModel.maxStudyPeriodValue,
-                      divisions: 7,
+                      divisions: 6,
                       value: _fetchedSetting.studyPeriod,
                       onChanged: (value) {
                         SettingModel _newValue = SettingModel(value, _fetchedSetting.breakPeriod);

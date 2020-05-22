@@ -4,11 +4,11 @@ enum PomodoroSession {
   BREAK
 }
 
-class PomodoroTimer {
+class PomodoroModel {
   final Duration elapsed;
   final Duration remaining;
   final PomodoroSession session;
   final bool inProgress;
 
-  PomodoroTimer(this.elapsed, this.remaining, this.session, this.inProgress);
+  PomodoroModel(this.elapsed, this.remaining, this.session, this.inProgress);
 }

@@ -1,6 +1,6 @@
 class SettingModel {
   static const double minStudyPeriodValue = 25;
-  static const double maxStudyPeriodValue = 60;
+  static const double maxStudyPeriodValue = 55;
   static const double minBreakPeriodValue = 5;
   static const double maxBreakPeriodValue = 25;
   final double studyPeriod;

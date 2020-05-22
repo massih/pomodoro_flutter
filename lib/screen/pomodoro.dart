@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pomodoro/service/pomodoro_bloc.dart';
-import 'package:pomodoro/utils/pomodoro_helper.dart';
+import 'package:pomodoro/model/pomodoro_model.dart';
 import 'package:provider/provider.dart';
 
 class Pomodoro extends StatelessWidget {
@@ -13,8 +13,8 @@ class Pomodoro extends StatelessWidget {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(50.0),
-          child: Consumer<PomodoroTimer>(
-              builder: (BuildContext context, PomodoroTimer value, Widget child) {
+          child: Consumer<PomodoroModel>(
+              builder: (BuildContext context, PomodoroModel value, Widget child) {
                 if (value == null) {
                   _pomodoroBloc.initStudy();
                   return CircularProgressIndicator();
@@ -36,7 +36,7 @@ class Pomodoro extends StatelessWidget {
     );
   }
 
-  Stack buildPomodoro(BuildContext context, PomodoroTimer _data) {
+  Stack buildPomodoro(BuildContext context, PomodoroModel _data) {
     return Stack(
         children: <Widget>[
           SizedBox(
@@ -54,7 +54,7 @@ class Pomodoro extends StatelessWidget {
     );
   }
 
-  CircularProgressIndicator buildCircularProgressIndicator(BuildContext context, PomodoroTimer data) {
+  CircularProgressIndicator buildCircularProgressIndicator(BuildContext context, PomodoroModel data) {
     return CircularProgressIndicator(
       backgroundColor: Theme
           .of(context)
@@ -67,7 +67,7 @@ class Pomodoro extends StatelessWidget {
     );
   }
 
-  Text buildTimerText(PomodoroTimer _data) {
+  Text buildTimerText(PomodoroModel _data) {
     return Text(
       _getTimerText(_data),
       style: TextStyle(
@@ -79,20 +79,20 @@ class Pomodoro extends StatelessWidget {
     );
   }
 
-  double _getIndicatorValue(PomodoroTimer _data) {
+  double _getIndicatorValue(PomodoroModel _data) {
     if (_data.elapsed.inSeconds == 0) {
       return 0;
     }
     return _data.elapsed.inSeconds / (_data.remaining.inSeconds + _data.elapsed.inSeconds);
   }
 
-  String _getTimerText(PomodoroTimer _data) {
+  String _getTimerText(PomodoroModel _data) {
     var minutes = _data.remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
     var seconds = _data.remaining.inSeconds.remainder(60).toString().padLeft(2, '0');
     return '$minutes:$seconds';
   }
 
-  RaisedButton buildStartRaisedButton(PomodoroTimer _pomodoroTimer) {
+  RaisedButton buildStartRaisedButton(PomodoroModel _pomodoroTimer) {
     final _buttonText = _pomodoroTimer.inProgress ? 'Cancel' : 'Start';
     if (_pomodoroTimer.inProgress) {
       return RaisedButton(child: Text(_buttonText), onPressed: () {

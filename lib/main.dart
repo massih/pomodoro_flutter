@@ -4,7 +4,7 @@ import 'package:pomodoro/screen/settings.dart';
 import 'package:pomodoro/screen/statistics.dart';
 import 'package:pomodoro/service/pomodoro_bloc.dart';
 import 'package:pomodoro/service/setting_bloc.dart';
-import 'package:pomodoro/utils/pomodoro_helper.dart';
+import 'package:pomodoro/model/pomodoro_model.dart';
 import 'package:provider/provider.dart';
 
 import 'model/setting_model.dart';
@@ -48,7 +48,7 @@ class _HomePageState extends State<HomePage> {
     return MultiProvider(
       providers: [
         StreamProvider<SettingModel>.value(value: SettingBloc().setting),
-        StreamProvider<PomodoroTimer>.value(value: PomodoroBloc().timer)
+        StreamProvider<PomodoroModel>.value(value: PomodoroBloc().timer)
       ],
       child: Scaffold(
         body: Center(

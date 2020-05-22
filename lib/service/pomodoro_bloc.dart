@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:pomodoro/service/setting_bloc.dart';
 import 'package:pomodoro/utils/database.dart';
-import 'package:pomodoro/utils/pomodoro_helper.dart';
+import 'package:pomodoro/model/pomodoro_model.dart';
 import 'package:quiver/async.dart';
 
 class PomodoroBloc {
@@ -10,7 +10,7 @@ class PomodoroBloc {
   static PomodoroBloc _instance;
   static CountdownTimer _countdownTimer;
   final DBHelper _dbHelper = DBHelper();
-  final StreamController _streamController = StreamController<PomodoroTimer>();
+  final StreamController _streamController = StreamController<PomodoroModel>();
 
   bool _inProgress = false;
   PomodoroSession _session;
@@ -36,7 +36,7 @@ class PomodoroBloc {
     });
   }
 
-  Stream<PomodoroTimer> get timer {
+  Stream<PomodoroModel> get timer {
     return _streamController.stream;
   }
 
@@ -76,7 +76,7 @@ class PomodoroBloc {
     _inProgress = false;
     _session = PomodoroSession.STUDY;
     final Duration _studyPeriod = await _dbHelper.getStudyDuration();
-    final PomodoroTimer _pomodoroTimer = PomodoroTimer(
+    final PomodoroModel _pomodoroTimer = PomodoroModel(
         Duration(minutes: 0),
         _studyPeriod,
         _session,
@@ -89,7 +89,7 @@ class PomodoroBloc {
     _session = PomodoroSession.BREAK;
 
     final Duration _breakPeriod = await _dbHelper.getBreakDuration();
-    final PomodoroTimer _pomodoroTimer = PomodoroTimer(
+    final PomodoroModel _pomodoroTimer = PomodoroModel(
         Duration(minutes: 0),
         _breakPeriod,
         _session,
@@ -98,7 +98,7 @@ class PomodoroBloc {
   }
 
   void streamPomodoroTimer(CountdownTimer event) {
-    final _timerData = PomodoroTimer(event.elapsed, event.remaining, _session, _inProgress);
+    final _timerData = PomodoroModel(event.elapsed, event.remaining, _session, _inProgress);
     _streamController.add(_timerData);
   }
 
