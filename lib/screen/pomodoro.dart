@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pomodoro/service/pomodoro_bloc.dart';
 import 'package:pomodoro/model/pomodoro_model.dart';
+import 'package:pomodoro/service/pomodoro_bloc.dart';
 import 'package:provider/provider.dart';
 
 class Pomodoro extends StatelessWidget {

@@ -11,70 +11,83 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingPageState extends State<SettingsPage> {
   final SettingBloc _settingBloc = SettingBloc();
+  double _studyPeriod;
+  double _breakPeriod;
+
+  @override
+  void initState() {
+    _settingBloc.fetchSetting().then((value) {
+      setState(() {
+        _studyPeriod = value.studyPeriod;
+        _breakPeriod = value.breakPeriod;
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-//    TODO change to CONSUMER and change this stateful, save in DB onChangeDone
+    if (_breakPeriod == null || _studyPeriod == null) {
+      return CircularProgressIndicator();
+    }
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        StreamBuilder<SettingModel>(
-            stream: _settingBloc.setting,
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return Text('LOADING...');
-              }
-              SettingModel _fetchedSetting = snapshot.data;
-              return Wrap(
-                children: <Widget>[
-                  buildStudyPeriodSlider(_fetchedSetting),
-                  buildBreakPeriodSlider(_fetchedSetting)
-                ],
-              );
-            }
-        )
+        buildStudyPeriodSlider(),
+        buildBreakPeriodSlider(),
       ],
     );
   }
 
-  Row buildBreakPeriodSlider(SettingModel _fetchedSetting) {
+  Row buildBreakPeriodSlider() {
     return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text('Break Period:'),
-                    Slider(
-                      min: SettingModel.minBreakPeriodValue,
-                      max: SettingModel.maxBreakPeriodValue,
-                      divisions: 20,
-                      value: _fetchedSetting.breakPeriod,
-                      onChanged: (value) {
-                        SettingModel _newValue = SettingModel(_fetchedSetting.studyPeriod, value);
-                        _settingBloc.updateSetting(_newValue);
-                      },
-                    ),
-                    Text('${_fetchedSetting.breakPeriod.toInt()} min'),
-                  ],
-                );
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text('Break Period:'),
+        Slider(
+          min: SettingModel.minBreakPeriodValue,
+          max: SettingModel.maxBreakPeriodValue,
+          divisions: 20,
+          value: _breakPeriod,
+          onChanged: (value) {
+            setState(() {
+              _breakPeriod = value;
+            });
+          },
+          onChangeEnd: (value) {
+            SettingModel _newValue = SettingModel(_studyPeriod, value);
+            _settingBloc.updateSetting(_newValue);
+          },
+        ),
+        Text('${_breakPeriod.toInt()} min'),
+      ],
+    );
   }
 
-  Row buildStudyPeriodSlider(SettingModel _fetchedSetting) {
+  Row buildStudyPeriodSlider() {
     return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text('Study Period:'),
-                    Slider(
-                      min: SettingModel.minStudyPeriodValue,
-                      max: SettingModel.maxStudyPeriodValue,
-                      divisions: 6,
-                      value: _fetchedSetting.studyPeriod,
-                      onChanged: (value) {
-                        SettingModel _newValue = SettingModel(value, _fetchedSetting.breakPeriod);
-                        _settingBloc.updateSetting(_newValue);
-                      },
-                    ),
-                    Text('${_fetchedSetting.studyPeriod.toInt()} min'),
-                  ],
-                );
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text('Study Period:'),
+        Slider(
+          min: SettingModel.minStudyPeriodValue,
+          max: SettingModel.maxStudyPeriodValue,
+          divisions: 6,
+          value: _studyPeriod,
+          onChanged: (value) {
+            setState(() {
+              _studyPeriod = value;
+            });
+          },
+          onChangeEnd: (value) {
+            SettingModel _newValue = SettingModel(value, _breakPeriod);
+            _settingBloc.updateSetting(_newValue);
+          },
+        ),
+        Text('${_studyPeriod.toInt()} min'),
+      ],
+    );
   }
 
 }

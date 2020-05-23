@@ -1,5 +1,5 @@
 name: pomodoro
-description: A new Flutter application.
+description: Yet Another Pomodoro App.
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -28,6 +28,13 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  flutter_launcher_icons: ^0.7.5
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/tomato-512.png"
 
 flutter:
   uses-material-design: true

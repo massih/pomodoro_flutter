@@ -1,4 +1,3 @@
-
 enum PomodoroSession {
   STUDY,
   BREAK

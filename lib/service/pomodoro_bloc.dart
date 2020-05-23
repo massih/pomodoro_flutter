@@ -1,8 +1,8 @@
 import 'dart:async';
 
+import 'package:pomodoro/model/pomodoro_model.dart';
 import 'package:pomodoro/service/setting_bloc.dart';
 import 'package:pomodoro/utils/database.dart';
-import 'package:pomodoro/model/pomodoro_model.dart';
 import 'package:quiver/async.dart';
 
 class PomodoroBloc {
