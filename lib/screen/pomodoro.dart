@@ -11,37 +11,31 @@ class Pomodoro extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(50.0),
-          child: Consumer<PomodoroModel>(
-              builder: (BuildContext context, PomodoroModel value, Widget child) {
-                if (value == null) {
-                  _pomodoroBloc.initStudy();
-                  return CircularProgressIndicator();
-                }
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                        margin: const EdgeInsets.all(30.0),
-                        child: buildTopText(value.session)
-                    ),
-                    buildPomodoro(context, value),
-                    Container(
-                      padding: const EdgeInsets.all(50.0),
-                      child: buildStartRaisedButton(value),
-                    ),
-                  ],
-                );
+        child: Consumer<PomodoroModel>(
+            builder: (BuildContext context, PomodoroModel value, Widget child) {
+              if (value == null) {
+                _pomodoroBloc.initStudy();
+                return CircularProgressIndicator();
               }
-          ),
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  buildTopText(value.session),
+                  buildPomodoro(context, value),
+                  SizedBox(
+                      child: buildStartRaisedButton(value),
+                      width: double.infinity
+                  ),
+                ],
+              );
+            }
         ),
       ),
     );
   }
 
   Text buildTopText(PomodoroSession _session) {
-    var _text =  _session == PomodoroSession.STUDY ? 'Focus on your task :)' : 'Take a break';
+    var _text = _session == PomodoroSession.STUDY ? 'Focus on your task :)' : 'Take a break';
     return Text(_text);
   }
 
