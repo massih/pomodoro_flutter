@@ -22,8 +22,12 @@ class Pomodoro extends StatelessWidget {
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
+                    Container(
+                        margin: const EdgeInsets.all(30.0),
+                        child: buildTopText(value.session)
+                    ),
                     buildPomodoro(context, value),
-                    Padding(
+                    Container(
                       padding: const EdgeInsets.all(50.0),
                       child: buildStartRaisedButton(value),
                     ),
@@ -34,6 +38,11 @@ class Pomodoro extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Text buildTopText(PomodoroSession _session) {
+    var _text =  _session == PomodoroSession.STUDY ? 'Focus on your task :)' : 'Take a break';
+    return Text(_text);
   }
 
   Stack buildPomodoro(BuildContext context, PomodoroModel _data) {
