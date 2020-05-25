@@ -5,6 +5,7 @@ import 'package:pomodoro/screen/settings.dart';
 import 'package:pomodoro/screen/statistics.dart';
 import 'package:pomodoro/service/pomodoro_bloc.dart';
 import 'package:pomodoro/service/setting_bloc.dart';
+import 'package:pomodoro/utils/localNotification.dart';
 import 'package:provider/provider.dart';
 
 import 'model/setting_model.dart';
@@ -36,6 +37,12 @@ class _HomePageState extends State<HomePage> {
     Pomodoro(),
     SettingsPage(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    initializeLocalNotification();
+  }
 
   void _onItemTapped(int index) {
     setState(() {

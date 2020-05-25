@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pomodoro/model/pomodoro_model.dart';
 import 'package:pomodoro/service/pomodoro_bloc.dart';
+import 'package:pomodoro/utils/localNotification.dart';
 import 'package:provider/provider.dart';
 
 class Pomodoro extends StatelessWidget {
@@ -13,55 +14,48 @@ class Pomodoro extends StatelessWidget {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(50.0),
-          child: Consumer<PomodoroModel>(
-              builder: (BuildContext context, PomodoroModel value, Widget child) {
-                if (value == null) {
-                  _pomodoroBloc.initStudy();
-                  return CircularProgressIndicator();
-                }
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    buildPomodoro(context, value),
-                    Padding(
-                      padding: const EdgeInsets.all(50.0),
-                      child: buildStartRaisedButton(value),
-                    ),
-                  ],
-                );
-              }
-          ),
+          child: Consumer<PomodoroModel>(builder:
+              (BuildContext context, PomodoroModel value, Widget child) {
+            if (value == null) {
+              _pomodoroBloc.initStudy();
+              return CircularProgressIndicator();
+            }
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                buildPomodoro(context, value),
+                Padding(
+                  padding: const EdgeInsets.all(50.0),
+                  child: buildStartRaisedButton(value),
+                ),
+              ],
+            );
+          }),
         ),
       ),
     );
   }
 
   Stack buildPomodoro(BuildContext context, PomodoroModel _data) {
-    return Stack(
-        children: <Widget>[
-          SizedBox(
-            width: 300,
-            height: 300,
-            child: buildCircularProgressIndicator(context, _data),
-          ),
-          Positioned.fill(
-              child: Align(
-                alignment: Alignment.center,
-                child: buildTimerText(_data),
-              )
-          ),
-        ]
-    );
+    return Stack(children: <Widget>[
+      SizedBox(
+        width: 300,
+        height: 300,
+        child: buildCircularProgressIndicator(context, _data),
+      ),
+      Positioned.fill(
+          child: Align(
+        alignment: Alignment.center,
+        child: buildTimerText(_data),
+      )),
+    ]);
   }
 
-  CircularProgressIndicator buildCircularProgressIndicator(BuildContext context, PomodoroModel data) {
+  CircularProgressIndicator buildCircularProgressIndicator(
+      BuildContext context, PomodoroModel data) {
     return CircularProgressIndicator(
-      backgroundColor: Theme
-          .of(context)
-          .primaryColor,
-      valueColor: AlwaysStoppedAnimation<Color>(Theme
-          .of(context)
-          .canvasColor),
+      backgroundColor: Theme.of(context).primaryColor,
+      valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).canvasColor),
       value: _getIndicatorValue(data),
       strokeWidth: 15,
     );
@@ -83,31 +77,41 @@ class Pomodoro extends StatelessWidget {
     if (_data.elapsed.inSeconds == 0) {
       return 0;
     }
-    return _data.elapsed.inSeconds / (_data.remaining.inSeconds + _data.elapsed.inSeconds);
+    return _data.elapsed.inSeconds /
+        (_data.remaining.inSeconds + _data.elapsed.inSeconds);
   }
 
   String _getTimerText(PomodoroModel _data) {
-    var minutes = _data.remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
-    var seconds = _data.remaining.inSeconds.remainder(60).toString().padLeft(2, '0');
+    var minutes =
+        _data.remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
+    var seconds =
+        _data.remaining.inSeconds.remainder(60).toString().padLeft(2, '0');
     return '$minutes:$seconds';
   }
 
   RaisedButton buildStartRaisedButton(PomodoroModel _pomodoroTimer) {
     final _buttonText = _pomodoroTimer.inProgress ? 'Cancel' : 'Start';
     if (_pomodoroTimer.inProgress) {
-      return RaisedButton(child: Text(_buttonText), onPressed: () {
-        _pomodoroBloc.cancelTimer();
-      });
+      return RaisedButton(
+          child: Text(_buttonText),
+          onPressed: () {
+            _pomodoroBloc.cancelTimer();
+          });
     }
 
     if (_pomodoroTimer.session == PomodoroSession.STUDY) {
-      return RaisedButton(child: Text(_buttonText), onPressed: () {
-        _pomodoroBloc.startStudySession(_pomodoroTimer.remaining);
-      });
+      return RaisedButton(
+          child: Text(_buttonText),
+          onPressed: () {
+            _pomodoroBloc.startStudySession(_pomodoroTimer.remaining);
+            scheduleNotification(1, DateTime.now().add(Duration(seconds: 5)));
+          });
     } else {
-      return RaisedButton(child: Text(_buttonText), onPressed: () {
-        _pomodoroBloc.startBreakSession(_pomodoroTimer.remaining);
-      });
+      return RaisedButton(
+          child: Text(_buttonText),
+          onPressed: () {
+            _pomodoroBloc.startBreakSession(_pomodoroTimer.remaining);
+          });
     }
   }
 }
