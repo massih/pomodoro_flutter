@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:pomodoro/contants/consts.dart';
+import 'package:pomodoro/model/consts.dart';
 import 'package:pomodoro/model/pomodoro_model.dart';
 import 'package:pomodoro/service/pomodoro_bloc.dart';
 import 'package:provider/provider.dart';
@@ -18,13 +18,12 @@ class Pomodoro extends StatelessWidget {
             _pomodoroBloc.initStudy();
             return CircularProgressIndicator();
           }
-          var _sessionValue = sessionValues[pomodoroModel.session];
           return Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              Text(_sessionValue.topText),
+              Text(_getTopText(pomodoroModel)),
               buildPomodoro(context, pomodoroModel),
-              buildStartRaisedButton(pomodoroModel, _sessionValue.color),
+              buildStartRaisedButton(pomodoroModel),
             ],
           );
         }),
@@ -32,24 +31,24 @@ class Pomodoro extends StatelessWidget {
     );
   }
 
-  Stack buildPomodoro(BuildContext context, PomodoroModel _data) {
+  Stack buildPomodoro(BuildContext context, PomodoroModel data) {
     return Stack(children: <Widget>[
       SizedBox(
         width: 300,
         height: 300,
-        child: buildCircularProgressIndicator(context, _data),
+        child: buildCircularProgressIndicator(context, data),
       ),
       Positioned.fill(
           child: Align(
         alignment: Alignment.center,
-        child: buildTimerText(_data),
+        child: buildTimerText(data),
       )),
     ]);
   }
 
   CircularProgressIndicator buildCircularProgressIndicator(BuildContext context, PomodoroModel data) {
     return CircularProgressIndicator(
-      backgroundColor: data.session == PomodoroSession.STUDY ? Theme.of(context).primaryColor : Colors.blue,
+      backgroundColor: _getColor(data),
       valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).canvasColor),
       value: _getIndicatorValue(data),
       strokeWidth: 15,
@@ -68,6 +67,33 @@ class Pomodoro extends StatelessWidget {
     );
   }
 
+  MaterialButton buildStartRaisedButton(PomodoroModel data) {
+    if (data.inProgress) {
+      return _roundRaisedButton(data, () {
+        _pomodoroBloc.cancelTimer();
+      });
+    }
+    if (data.session == PomodoroSession.STUDY) {
+      return _roundRaisedButton(data, () {
+        _pomodoroBloc.startStudySession(data.remaining);
+      });
+    } else {
+      return _roundRaisedButton(data, () {
+        _pomodoroBloc.startBreakSession(data.remaining);
+      });
+    }
+  }
+
+  MaterialButton _roundRaisedButton(PomodoroModel data, Function callBack) {
+    return MaterialButton(
+      minWidth: 170,
+      child: Text(_getButtonText(data)),
+      color: _getColor(data),
+      onPressed: callBack,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0), side: BorderSide(color: _getColor(data))),
+    );
+  }
+
   double _getIndicatorValue(PomodoroModel _data) {
     if (_data.elapsed.inSeconds == 0) {
       return 0;
@@ -81,31 +107,14 @@ class Pomodoro extends StatelessWidget {
     return '$minutes:$seconds';
   }
 
-  MaterialButton buildStartRaisedButton(PomodoroModel _pomodoroTimer, Color color) {
-    final _buttonText = _pomodoroTimer.inProgress ? 'Cancel' : 'Start';
-    if (_pomodoroTimer.inProgress) {
-      return _roundRaisedButton(_buttonText, color, () {
-        _pomodoroBloc.cancelTimer();
-      });
-    }
-    if (_pomodoroTimer.session == PomodoroSession.STUDY) {
-      return _roundRaisedButton(_buttonText, color,() {
-        _pomodoroBloc.startStudySession(_pomodoroTimer.remaining);
-      });
-    } else {
-      return _roundRaisedButton(_buttonText, color, () {
-        _pomodoroBloc.startBreakSession(_pomodoroTimer.remaining);
-      });
-    }
+  String _getTopText(PomodoroModel data) {
+    return data.session == PomodoroSession.STUDY ? topTextStudy : topTextBreak;
+  }
+  String _getButtonText(PomodoroModel data) {
+    return data.inProgress ? buttonTextCancel : buttonTextStart;
+  }
+  Color _getColor(PomodoroModel data) {
+    return data.session == PomodoroSession.STUDY ? colorStudy : colorBreak;
   }
 
-  MaterialButton _roundRaisedButton(String label, Color color, Function callBack) {
-    return MaterialButton(
-      minWidth: 170,
-      child: Text(label),
-      color: color,
-      onPressed: callBack,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0), side: BorderSide(color: Colors.red)),
-    );
-  }
 }
