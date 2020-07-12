@@ -9,11 +9,10 @@ class SettingModel {
   SettingModel(this.studyPeriod, this.breakPeriod);
 
   Map<String, dynamic> toMap() {
-    Map<String, dynamic> map = {
+    return {
       'study_period': studyPeriod,
       'break_period': breakPeriod
     };
-    return map;
   }
 
   static SettingModel fromMap(Map<String, dynamic> map) {

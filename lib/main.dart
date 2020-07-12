@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:pomodoro/model/pomodoro_model.dart';
+import 'package:pomodoro/model/study_time.dart';
 import 'package:pomodoro/screen/pomodoro.dart';
 import 'package:pomodoro/screen/settings.dart';
 import 'package:pomodoro/screen/statistics.dart';
 import 'package:pomodoro/service/pomodoro_bloc.dart';
 import 'package:pomodoro/service/setting_bloc.dart';
+import 'package:pomodoro/service/times_bloc.dart';
 import 'package:provider/provider.dart';
 
 import 'model/setting_model.dart';
