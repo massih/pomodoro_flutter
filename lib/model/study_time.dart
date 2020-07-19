@@ -1,21 +1,20 @@
 class StudyTime {
-  final String date;
-  final String start;
-  final String end;
+  final DateTime date;
   final int minutes;
 
-  StudyTime(this.date, this.start, this.end, this.minutes);
+  StudyTime(this.date, this.minutes);
 
   Map<String, dynamic> toMap() {
     return {
-      'date': date,
-      'start': start,
-      'end': end,
+      'year': date.year,
+      'month': date.month,
+      'day': date.day,
       'minutes': minutes
     };
   }
 
   static StudyTime fromMap(Map<String, dynamic> data) {
-    return StudyTime(data['date'], data['start'], data['end'], data['minutes']);
+    DateTime _datetime = new DateTime(data['year'], data['month'], data['day']);
+    return StudyTime(_datetime, data['minutes']);
   }
 }

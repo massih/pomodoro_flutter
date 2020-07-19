@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pomodoro/model/consts.dart';
 import 'package:pomodoro/model/pomodoro_model.dart';
 import 'package:pomodoro/model/study_time.dart';
 import 'package:pomodoro/screen/pomodoro.dart';
@@ -57,7 +58,7 @@ class _HomePageState extends State<HomePage> {
           child: _widgetOptions.elementAt(_selectedIndex),
         ),
         bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Colors.red,
+          backgroundColor: mainColor,
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.equalizer),

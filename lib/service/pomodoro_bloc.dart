@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:pomodoro/model/pomodoro_model.dart';
 import 'package:pomodoro/model/study_time.dart';
@@ -67,7 +68,6 @@ class PomodoroBloc {
     }, onDone: () {
       initStudy();
     });
-//  TODO save the timestamp for stats
   }
 
   void cancelTimer() {
@@ -93,15 +93,14 @@ class PomodoroBloc {
   }
 
   void saveStudyTime() {
-    int minutes = _countdownTimer.elapsed.inMinutes;
-//    if (minutes == 0) {
+    int _minutes = _countdownTimer.elapsed.inMinutes;
+//    if (_minutes == 0) {
 //      return;
 //    }
     DateTime _now = DateTime.now();
-    String date = "${_dateTime.year}-${_dateTime.month}-${_dateTime.day}";
-    String start = "${_dateTime.hour}:${_dateTime.minute}";
-    String stop = "${_now.hour}:${_now.minute}";
-    StudyTime _studyTime = StudyTime(date, start, stop, minutes);
+    _minutes = (new Random()).nextInt(30);
+    print("Save random study time: $_minutes");
+    StudyTime _studyTime = StudyTime(_dateTime, _minutes);
     _timeBloc.addStudyTime(_studyTime);
   }
 

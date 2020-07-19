@@ -7,8 +7,8 @@ import 'package:sqflite/sqflite.dart';
 
 class DBHelper {
   static const String _DBNAME = "pomodoro.db";
-  static const String _SETTINGS_TABLE = "settings";
-  static const String _STUDY_TABLE = "statistics";
+  static const String SETTINGS_TABLE = "settings";
+  static const String STUDY_TABLE = "statistics";
   static const int _DEFAULT_STUDY_PERIOD = 25;
   static const int _DEFAULT_BREAK_PERIOD = 5;
 
@@ -36,25 +36,25 @@ class DBHelper {
   }
 
   void _createTables(Database db, int version) {
-    String _sqlQueries = "CREATE TABLE $_SETTINGS_TABLE(study_period DOUBLE, break_period DOUBLE);";
+    String _sqlQueries = "CREATE TABLE $SETTINGS_TABLE(study_period DOUBLE, break_period DOUBLE);";
     db.execute(_sqlQueries);
 
-    _sqlQueries = "CREATE TABLE $_STUDY_TABLE(id INTEGER PRIMARY KEY, date TEXT, start TEXT, end TEXT, minutes INT);";
+    _sqlQueries = "CREATE TABLE $STUDY_TABLE(id INTEGER PRIMARY KEY, year INT, month INT, day INT, minutes INT);";
     db.execute(_sqlQueries);
 
-    _sqlQueries = "INSERT INTO $_SETTINGS_TABLE(study_period, break_period) VALUES($_DEFAULT_STUDY_PERIOD, $_DEFAULT_BREAK_PERIOD);";
+    _sqlQueries = "INSERT INTO $SETTINGS_TABLE(study_period, break_period) VALUES($_DEFAULT_STUDY_PERIOD, $_DEFAULT_BREAK_PERIOD);";
     db.execute(_sqlQueries);
   }
 
   Future<SettingModel> settingFetch() async {
     final Database client = await database;
-    final List<Map<String, dynamic>> result = await client.query(_SETTINGS_TABLE);
+    final List<Map<String, dynamic>> result = await client.query(SETTINGS_TABLE);
     return SettingModel.fromMap(result[0]);
   }
 
   void settingUpdate(SettingModel newSetting) async {
     final Database client = await database;
-    client.update(_SETTINGS_TABLE, newSetting.toMap());
+    client.update(SETTINGS_TABLE, newSetting.toMap());
   }
 
   Future<Duration> getStudyDuration() async {
@@ -65,16 +65,5 @@ class DBHelper {
   Future<Duration> getBreakDuration() async {
     double _fetchedBreakPeriod = (await settingFetch()).breakPeriod;
     return Duration(minutes: _fetchedBreakPeriod.toInt());
-  }
-
-  void studyTimeAdd(StudyTime data) async {
-    final Database client = await database;
-    client.insert(_STUDY_TABLE, data.toMap());
-  }
-
-  Future<List<StudyTime>> studyTimeGetAll() async {
-    final Database client = await database;
-    final List<Map<String, dynamic>> result = await client.query(_STUDY_TABLE);
-    return result.map((e) => StudyTime.fromMap(e)).toList();
   }
 }
